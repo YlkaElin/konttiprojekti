@@ -7,6 +7,8 @@ pvc.yaml = Persistent Volume Claim, luo persistent volume -storagen storage-clas
 nimi: "pod-persistent-volume"
 (löytyy Kubernetes Engine -> Storage)
 
+.yaml -tiedostot löytyy myös Cloud Storagesta: kontti-bucket/konttiprojekti
+
 
 ohjeet:
 https://devopscube.com/persistent-volume-google-kubernetes-engine/
