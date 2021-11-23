@@ -1,0 +1,26 @@
+# This file configures the hello-world app which serves public web traffic.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kontti-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kontti-app
+  template:
+    metadata:
+      labels:
+        app: kontti-app
+    spec:
+      containers:
+      - name: kontti-app
+        # Replace $LOCATION with your Artifact Registry location (e.g., us-west1).
+        # Replace $GCLOUD_PROJECT with your project ID.
+        image: us-central1-docker.pkg.dev/fall-week7-2/kontti-repo/kontti-app:latest
+        # This app listens on port 8080 for web traffic by default.
+        ports:
+        - containerPort: 8080
+        env:
+          - name: PORT
+            value: "8080"
