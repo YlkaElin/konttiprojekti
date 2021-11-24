@@ -17,7 +17,6 @@ def connect():
 #     conn.row_factory = sqlite3.Row
 #     return conn
 
-
 def get_post(post_id):
     try:
         con = connect()
