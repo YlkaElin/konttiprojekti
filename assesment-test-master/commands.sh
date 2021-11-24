@@ -73,8 +73,20 @@ kubectl get svc postgres
 psql -h localhost -U postgres --password -p 31070 assesment
 
 #For deletion of PostgreSQL resources, we need to use below commands.
-kubectl delete service postgres 
-kubectl delete deployment postgres
-kubectl delete configmap postgres-config
-kubectl delete persistentvolumeclaim postgres-pv-claim
-kubectl delete persistentvolume postgres-pv-volume
+kubectl delete service poistettavan nimi - postgres 
+kubectl delete deployment poistettavan nimi - postgres
+kubectl delete configmap poistettavan nimi - postgres-config
+kubectl delete persistentvolumeclaim poistettavan nimi - postgres-pv-claim
+kubectl delete persistentvolume poistettavan nimi - postgres-pv-volume
+
+#connect to cluster:
+gcloud container clusters get-credentials konttiklusteri --zone us-central1-c --project fall-week7-2
+
+#copy all files from bucket
+gsutil cp -r gs://kontti-bucket/konttiprojekti .
+
+#connect to postgres pod:
+kubectl exec --stdin --tty postgres-6d9b89c9d8-hh5fm -- /bin/bash
+
+#login to database:
+psql -U
