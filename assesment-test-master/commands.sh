@@ -42,3 +42,39 @@ kubectl apply -f kontti-service.yaml
 
 #Get the external IP address of the Service:
 kubectl get services
+
+
+#create secret:
+kubectl create secret generic password \
+  --from-literal password=juukeli
+
+#get password:
+
+kubectl get secret password -o jsonpath='{.data}'
+
+#check:
+echo 'encrypted password' | base64 --decode
+
+
+#deploy postgres using k8s
+kubectl create -f postgres-configmap.yaml 
+
+#Create storage related deployments
+kubectl create -f postgres-storage.yaml 
+
+#Create Postgres Service
+kubectl create -f postgres-service.yaml
+
+
+#For connecting PostgreSQL, we need to get the Node port from the service deployment.
+kubectl get svc postgres
+
+#We need to use port 31070 to connect to PostgreSQL from machine/node present in kubernetes cluster with credentials given in the configmap earlier.
+psql -h localhost -U postgres --password -p 31070 assesment
+
+#For deletion of PostgreSQL resources, we need to use below commands.
+kubectl delete service postgres 
+kubectl delete deployment postgres
+kubectl delete configmap postgres-config
+kubectl delete persistentvolumeclaim postgres-pv-claim
+kubectl delete persistentvolume postgres-pv-volume
