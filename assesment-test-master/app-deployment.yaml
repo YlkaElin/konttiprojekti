@@ -7,8 +7,8 @@ spec:
     app: assesment-app
   ports:
   - protocol: "TCP"
-    port: 6000
-    targetPort: 80
+    port: 80
+    targetPort: 8080
   type: LoadBalancer
 
 ---
@@ -28,7 +28,51 @@ spec:
     spec:
       containers:
       - name: assesment-app
-        image: us-central1-docker.pkg.dev/fall-week7-2/kontti-repo/assesment-test-master:latest
+        image: us-central1-docker.pkg.dev/fall-week7-2/kontti-repo/assesment-test-master:v5
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
+
+
+
+
+##################### Alla fiksattu versio:
+apiVersion: v1
+kind: Service
+metadata:
+  name: blog-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: blog-app
+  ports:
+  - port: 80
+    targetPort: 8080
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blog-app
+  template:
+    metadata:
+      labels:
+        app: blog-app
+    spec:
+      containers:
+      - name: blog-app
+        # Replace $LOCATION with your Artifact Registry location (e.g., us-west1).
+        # Replace $GCLOUD_PROJECT with your project ID.
+        image: us-central1-docker.pkg.dev/fall-week7-2/kontti-repo/assesment-test-master:v5
+        # This app listens on port 8080 for web traffic by default.
+        ports:
+        - containerPort: 8080
+        env:
+          - name: PORT
+            value: "8080"

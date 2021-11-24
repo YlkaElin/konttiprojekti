@@ -88,5 +88,7 @@ gsutil cp -r gs://kontti-bucket/konttiprojekti .
 #connect to postgres pod:
 kubectl exec --stdin --tty postgres-6d9b89c9d8-hh5fm -- /bin/bash
 
+kubectl exec --stdin --tty blog-deployment-775f8897f-j44kw -- /bin/bash
+
 #login to database:
 psql -U
