@@ -1,3 +1,5 @@
+""" Näyttää hyvältä ja ootte saaneet psycopg:n nätisti funktioihin. """
+
 import psycopg2
 from config import configmodule
 from flask import Flask, render_template, request, url_for, flash, redirect

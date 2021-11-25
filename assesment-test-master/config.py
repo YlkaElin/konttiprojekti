@@ -2,6 +2,8 @@
 
 from configparser import ConfigParser
 
+# Olis kiinnostavaa tietää, miten saitte tän toimiin database.ini-tiedoston kanssa. Onko noi
+# kirjautumistiedot siis kovakoodattuna jossain vai kuis?
 def configmodule(filename='database.ini', section='postgresql'):
     parser = ConfigParser()
     parser.read(filename)
