@@ -8,3 +8,4 @@ data:
   POSTGRES_DB: assesment
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: juukeli
+  # täältä löytyi tietokannan kirjautumistiedot plaintextinä, nää olis kannattanut piilottaa

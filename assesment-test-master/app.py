@@ -5,6 +5,11 @@ from flask import Flask, render_template, request, url_for, flash, redirect
 from datetime import datetime
 #from init_db import do_init
 
+# -------------------------------------------------------------------------------------
+# huippua että ootte hakeneet Secret Managerista kirjautumistiedot
+# olisko tän funktion kuitenkin laittaa omaan moduliinsa, niin olis saanut
+# koodista kokonaisuutena vähän luettavampaa?
+# -------------------------------------------------------------------------------------
 
 def connect():
     try:
@@ -18,6 +23,13 @@ def connect():
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
     return con
+
+# -------------------------------------------------------------------------------------
+# databasen connectionin olis voinut laittaa omaan funktioonsa, nyt se paisuttaa funktioita aika
+# paljon ja koodissa on turhaa toistoa sen takia aika paljon
+
+# näitä vanhoja kommenttaja vois siivota pois kauttaaltaan:
+# -------------------------------------------------------------------------------------
 
 # vanha connect-versio
 #def connect():
