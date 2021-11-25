@@ -10,7 +10,7 @@ gcloud artifacts repositories create kontti-repo \
 gcloud artifacts locations list
 
 #Build your container image using Cloud Build, which is similar to running docker build and docker push, but the build happens on Google Cloud:
-gcloud builds submit --tag us-central1-docker.pkg.dev/fall-week7-2/kontti-repo/kontti-secrets-app .
+gcloud builds submit --tag us-central1-docker.pkg.dev/fall-week7-2/kontti-repo/blog-app .
 #tai:
 gcloud builds submit \
     --tag us-central1-docker.pkg.dev/fall-week7-2/kontti-repo/kontti-app .
