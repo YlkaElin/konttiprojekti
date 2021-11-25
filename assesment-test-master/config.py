@@ -24,26 +24,3 @@ def access_secrets(project_id, secret_id, version_id):
     # snippet is showing how to access the secret material.
     payload = response.payload.data.decode("UTF-8")
     return payload
-
-
-# if __name__ == "__main__":
-#     access_secrets("fall-week7-2", "database", "latest")
-#     access_secrets("fall-week7-2", "username", "latest")
-#     access_secrets("fall-week7-2", "password", "latest")
-
- # parsitaan database.ini tiedoston sisältö ja palautetaan se
-
-# from configparser import ConfigParser
-
-# def configmodule(filename='database.ini', section='postgresql'):
-#     parser = ConfigParser()
-#     parser.read(filename)
-#     db = {}
-#     if parser.has_section(section):
-#         params = parser.items(section)
-#         for param in params:
-#             db[param[0]] = param[1]
-#     else:
-#         raise
-#       Exception('Section {0} not found in the {1} file'.format(section, filename))
-#     return db

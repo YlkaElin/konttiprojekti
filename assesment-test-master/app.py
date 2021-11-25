@@ -19,18 +19,6 @@ def connect():
         print(error)
     return con
 
-# vanha connect-versio
-#def connect():
-#     try:
-#         con = psycopg2.connect(**configmodule())
-#     except (Exception, psycopg2.DatabaseError) as error:
-#         print(error)
-#     return con
-
-# def get_db_connection():
-#     conn = sqlite3.connect('database.db')
-#     conn.row_factory = sqlite3.Row
-#     return conn
 
 def get_post(post_id):
     try:
@@ -148,7 +136,7 @@ def edit(id):
             flash('Title is required!')
         else:
             try:
-                con = psycopg2.connect(**configmodule())
+                con = connect()
                 cursor = con.cursor()
                 SQL = """ UPDATE posts
                     SET title = %s, content = %s
@@ -173,7 +161,7 @@ def delete(id):
     post = get_post(id)
     post_title = {'title': post[2]}
     try:
-        con = psycopg2.connect(**configmodule())
+        con = connect()
         cursor = con.cursor()
         SQL = """ DELETE FROM posts
               WHERE id = '%s'; """
