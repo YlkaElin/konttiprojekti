@@ -1,12 +1,17 @@
 import psycopg2
-from config import configmodule
+from config import access_secrets
 from flask import Flask, render_template, request, url_for, flash, redirect
 from datetime import datetime
 
-
 def connect():
     try:
-        con = psycopg2.connect(**configmodule())
+        con = psycopg2.connect(
+            dbname=access_secrets("fall-week7-2", "database", "latest"),
+            password=access_secrets("fall-week7-2", "password", "latest"),
+            host=access_secrets("fall-week7-2", "ip", "latest"),
+            user=access_secrets("fall-week7-2", "username", "latest"),
+            port=5432
+        )
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
     return con
@@ -119,7 +124,7 @@ def edit(id):
             flash('Title is required!')
         else:
             try:
-                con = psycopg2.connect(**configmodule())
+                con = connect()
                 cursor = con.cursor()
                 SQL = """ UPDATE posts
                     SET title = %s, content = %s
@@ -144,7 +149,7 @@ def delete(id):
     post = get_post(id)
     post_title = {'title': post[2]}
     try:
-        con = psycopg2.connect(**configmodule())
+        con = connect()
         cursor = con.cursor()
         SQL = """ DELETE FROM posts
               WHERE id = '%s'; """
