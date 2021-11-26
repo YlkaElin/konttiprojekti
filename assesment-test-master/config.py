@@ -1,9 +1,11 @@
+
+
 def access_secrets(project_id, secret_id, version_id):
+
     """
     Access the payload for the given secret version if one exists. The version
     can be a version number as a string (e.g. "5") or an alias (e.g. "latest").
     """
-
     # Import the Secret Manager client library.
     from google.cloud import secretmanager
 

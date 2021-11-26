@@ -1,7 +1,10 @@
 import psycopg2
 from config import access_secrets
 from flask import Flask, render_template, request, url_for, flash, redirect
+#from werkzeug.exceptions import abort
 from datetime import datetime
+#from init_db import do_init
+
 
 def connect():
     try:
@@ -28,8 +31,17 @@ def get_post(post_id):
         con.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+    # if con is not None:
+    #     con.close()
     return post
     
+# juttu = get_post(1)
+# print(juttu)
+
+# SQL = """ INSERT INTO "posts" (title, content)
+#     VALUES (%s,%s);"""
+# records_to_insert = (title, content)
+# cursor.executemany(SQL, (records_to_insert,))
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'do_not_touch_or_you_will_be_fired'
