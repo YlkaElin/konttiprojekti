@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 database.db
+database.ini
 
 # Environments
 .env
