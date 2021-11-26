@@ -1,38 +1,58 @@
-import sqlite3
+import psycopg2
+from config import access_secrets
 from flask import Flask, render_template, request, url_for, flash, redirect
-from werkzeug.exceptions import abort
+#from werkzeug.exceptions import abort
 from datetime import datetime
-from init_db import do_init
-import os
+#from init_db import do_init
 
 
-def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    return conn
-
-#
+def connect():
+    try:
+        con = psycopg2.connect(
+            dbname=access_secrets("fall-week7-2", "database", "latest"),
+            password=access_secrets("fall-week7-2", "password", "latest"),
+            host=access_secrets("fall-week7-2", "ip", "latest"),
+            user=access_secrets("fall-week7-2", "username", "latest"),
+            port=5432
+        )
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    return con
 
 
 def get_post(post_id):
-    conn = get_db_connection()
-    post = conn.execute('SELECT * FROM posts WHERE id = ?',
-                        (post_id,)).fetchone()
-    conn.close()
-    if post is None:
-        abort(404)
+    try:
+        con = connect()
+        cursor = con.cursor()
+        cursor.execute('SELECT * FROM posts WHERE id = %s',
+                            (post_id,))
+        post = cursor.fetchone()
+        cursor.close()
+        con.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    # if con is not None:
+    #     con.close()
     return post
+    
+# juttu = get_post(1)
+# print(juttu)
 
+# SQL = """ INSERT INTO "posts" (title, content)
+#     VALUES (%s,%s);"""
+# records_to_insert = (title, content)
+# cursor.executemany(SQL, (records_to_insert,))
 
 app = Flask(__name__)
-do_init()
 app.config['SECRET_KEY'] = 'do_not_touch_or_you_will_be_fired'
 
 
 # this function is used to format date to a finnish time format from database format
 # e.g. 2021-07-20 10:36:36 is formateed to 20.07.2021 klo 10:36
+
 def format_date(post_date):
-    isodate = post_date.replace(' ', 'T')
+    post_date = str(post_date)
+    isodate = post_date[:19]
     newdate = datetime.fromisoformat(isodate)
     return newdate.strftime('%d.%m.%Y') + ' klo ' + newdate.strftime('%H:%M')
 
@@ -40,23 +60,38 @@ def format_date(post_date):
 # this index() gets executed on the front page where all the posts are
 @app.route('/')
 def index():
-    conn = get_db_connection()
-    posts = conn.execute('SELECT * FROM posts').fetchall()
-    conn.close()
+    try:
+        con = connect()
+        cursor = con.cursor()
+        SQL = 'SELECT * FROM posts'
+        cursor.execute(SQL)
+        posts = cursor.fetchall()
+        cursor.close()
+        con.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
     # we need to iterate over all posts and format their date accordingly
-    dictrows = [dict(row) for row in posts]
-    for post in dictrows:
+    sanakirja = []
+
+    for row in posts:
+        yksirowi = {'id': row[0], 'created': row[1], 'title': row[2], 'content': row[3]}
+        sanakirja.append(yksirowi)
+
+    for post in sanakirja:
         # using our custom format_date(...)
         post['created'] = format_date(post['created'])
-    return render_template('index.html', posts=dictrows)
+
+    return render_template('index.html', posts=sanakirja)
 
 
 # here we get a single post and return it to the browser
 @app.route('/<int:post_id>')
 def post(post_id):
-    post = dict(get_post(post_id))
-    post['created'] = format_date(post['created'])
-    return render_template('post.html', post=post)
+    post = get_post(post_id)
+    post_dictionary = {"id": post[0], "created": post[1], "title": post[2], "content": post[3]}
+    post_dictionary['created'] = format_date(post_dictionary['created'])
+    return render_template('post.html', post=post_dictionary)
 
 
 # here we create a new post
@@ -69,11 +104,20 @@ def create():
         if not title:
             flash('Title is required!')
         else:
-            conn = get_db_connection()
-            conn.execute('INSERT INTO posts (title, content) VALUES (?, ?)',
-                         (title, content))
-            conn.commit()
-            conn.close()
+            try:
+                con = connect()
+                cursor = con.cursor()
+                SQL = """ INSERT INTO "posts" (title, content)
+                    VALUES (%s,%s);"""
+                records_to_insert = (title, content)
+                cursor.executemany(SQL, (records_to_insert,))
+                con.commit()
+                cursor.close()
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+            finally:
+                if con is not None:
+                    con.close()
             return redirect(url_for('index'))
 
     return render_template('create.html')
@@ -82,7 +126,8 @@ def create():
 @app.route('/<int:id>/edit', methods=('GET', 'POST'))
 def edit(id):
     post = get_post(id)
-
+    post_dictionary = {"id": post[0], "created": post[1], "title": post[2], "content": post[3]}
+    post_dictionary['created'] = format_date(post_dictionary['created'])
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
@@ -90,28 +135,44 @@ def edit(id):
         if not title:
             flash('Title is required!')
         else:
-            conn = get_db_connection()
-            conn.execute('UPDATE posts SET title = ?, content = ?'
-                         ' WHERE id = ?',
-                         (title, content, id))
-            conn.commit()
-            conn.close()
+            try:
+                con = connect()
+                cursor = con.cursor()
+                SQL = """ UPDATE posts
+                    SET title = %s, content = %s
+                    WHERE id = %s """
+                records_to_insert = (title, content, id)
+                cursor.executemany(SQL, (records_to_insert,))
+                con.commit()
+                cursor.close()
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+            finally:
+                if con is not None:
+                    con.close()
             return redirect(url_for('index'))
 
-    return render_template('edit.html', post=post)
+    return render_template('edit.html', post=post_dictionary)
 
 
 # Here we delete a SINGLE post.
 @app.route('/<int:id>/delete', methods=('POST',))
 def delete(id):
     post = get_post(id)
-    conn = get_db_connection()
-    conn.execute('DELETE FROM posts WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
-    flash('"{}" was successfully deleted!'.format(post['title']))
+    post_title = {'title': post[2]}
+    try:
+        con = connect()
+        cursor = con.cursor()
+        SQL = """ DELETE FROM posts
+              WHERE id = '%s'; """
+        records_to_insert = (id,)
+        cursor.execute(SQL, records_to_insert)
+        con.commit()
+        cursor.close()
+        flash('"{}" was successfully deleted!'.format(post_title['title']))
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if con is not None:
+            con.close()
     return redirect(url_for('index'))
-
-
-if __name__ == "__main__":
-    app.run(debug=True,host='0.0.0.0',port=int(os.environ.get('PORT', 8080)))
